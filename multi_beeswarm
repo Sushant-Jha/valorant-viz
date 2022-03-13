@@ -1,0 +1,75 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+import seaborn as sns
+
+import highlight_text
+
+df2 = pd.read_csv('TR.csv')
+
+#set default colors
+text_color = 'white'
+background = '#313332'
+
+df2.head()
+
+df2['Player'] = df2['Player'].str.split('\n',expand=True)[0]
+df2
+metrics = ['KPR','FKPR','KMax','K:D']
+
+fig,axes = plt.subplots(2,2,figsize=(14,10))
+fig.set_facecolor(background)
+
+
+#set up our base layer
+mpl.rcParams['xtick.color'] = text_color
+mpl.rcParams['ytick.color'] = text_color
+
+#create a list of comparisons
+counter=0
+counter2=0
+met_counter = 0
+
+for i,ax in zip(df2['Player'],axes.flatten()):
+    ax.set_facecolor(background)
+    ax.grid(ls='dotted',lw=.5,color='lightgrey',axis='y',zorder=1)
+
+    spines = ['top','bottom','left','right']
+    for x in spines:
+        if x in spines:
+            ax.spines[x].set_visible(False)
+
+    sns.swarmplot(x=metrics[met_counter],data=df2,ax=axes[counter,counter2],zorder=1,color='#64645e')
+    ax.set_xlabel(f'{metrics[met_counter]}',c='white')
+
+    for x in range(len(df2['Player'])):
+        #if df2['Player'][x] == 'Thiago Alcántara':
+            #ax.scatter(x=df2[metrics[met_counter]][x],y=0,s=200,c='red',zorder=2)
+        if df2['Player'][x] == 'DeepMans':
+            ax.scatter(x=df2[metrics[met_counter]][x],y=0,s=200,c='#6CABDD',zorder=2)
+
+    met_counter+=1
+    if counter2 == 0:
+        counter2 = 1
+        continue
+    if counter2 == 1:
+        counter2 = 0
+        counter+=1
+
+
+
+s='<DeepMans> All VRLs Kill Stats'
+highlight_text.fig_text(s=s,
+                x=.25, y=.88,
+                #highlight_weights = ['bold'],
+                fontsize=22,
+                fontfamily = 'Andale Mono',
+                #color = text_color,
+                #highlight_colors = ['#6CABDD'],
+                va='center'
+               )
+
+fig.text(.12,.05,"all stats for kills , KPR, FKPR,KMax & K:D",fontsize=11, fontfamily='Andale Mono',color=text_color)
+fig.text(.12,.03,"@_SushantJha / data via rib.gg", fontstyle='italic',fontsize=11, fontfamily='Andale Mono',color=text_color)
+
+plt.savefig('test.png',dpi=500,bbox_inches = 'tight',facecolor=background)
